@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+.w3-sidenav a,.w3-sidenav h4 {font-family: "Raleway", sans-serif;}
+</style>
+<body class="w3-light-grey">
+  <?php include '../session.php';?>
+  <?php include '../connect.php';?>
+  <!-- Top container -->
+  <div class="w3-container w3-top w3-black w3-large w3-padding" style="z-index:4">
+    <button class="w3-btn w3-hide-large w3-padding-0 w3-hover-text-grey" onclick="w3_open()">☰  Menu</button>
+    <span class="w3-right"><a href="../logout.php">Logout</a></span> 
+  </div>
+
+  <!-- Sidenav/menu -->
+  <nav class="w3-sidenav w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;"><br>
+    <div class="w3-container">
+      <h5>Course Details</h5>
+      <!-- Course Info -->
+      <div class="w3-card-2 w3-round w3-white">
+        <div class="w3-container">
+        <h4 class="w3-center">Course Name</h4>
+         <hr>
+         <!-- script for course info -->
+         <?php
+          $crs_id = $_GET['crs_id'];
+          $sql="SELECT * FROM course WHERE crs_id = '".$crs_id."'";
+          $result = mysqli_query($con,$sql);
+          if (!$result) {
+              printf("Error: %s\n", mysqli_error($con));
+              exit();
+          }
+
+          while($row = mysqli_fetch_array($result)) {
+             $query = "SELECT prof_name FROM professor where prof_id ='".$row['prof_id']."'";
+            $res = mysqli_fetch_array(mysqli_query($con,$query));
+              echo "
+                   <p><i class=\"fa fa-pencil w3-margin-right w3-text-theme\"></i>Professor : ".$res['prof_name']."</p>
+                   <p><i class=\"fa fa-home w3-margin-right w3-text-theme\"></i>Course Name : ".$row['crs_name']." </p>
+                   <p><i class=\"fa fa-home w3-margin-right w3-text-theme\"></i>Chapters : ".$row['crs_chapters']."</p>
+                   <p><i class=\"fa fa-birthday-cake w3-margin-right w3-text-theme\"></i>Duration : ".$row['crs_duration']." days</p>
+                   <p><i class=\"fa fa-birthday-cake w3-margin-right w3-text-theme\"></i>Students Enrolled : ".$row['crs_enrolled']."</p>
+                   <p><i class=\"fa fa-birthday-cake w3-margin-right w3-text-theme\"></i>Students Completed : ".$row['crs_completed']."</p>
+
+                   ";
+              }
+          ?>
+        </div>
+      </div>
+      <br>
+    </div>
+
+      <!-- Script for student status -->
+    <?php
+      
+      $stu_id = $_SESSION['stu_id'];
+      $sql="SELECT * FROM stu_course WHERE stu_id = '$stu_id'  AND crs_id='$crs_id' " ;
+      $result = mysqli_query($con,$sql);
+      if (!$result) {
+          printf("Error: %s\n", mysqli_error($con));
+          exit();
+      }
+
+      if( mysqli_num_rows($result) == 0)
+              {echo "<div class=\"w3-container w3-blue \" style=\"margin:15px;height: 30px\">
+                  <a href=\"../student/enroll.php?crs_id=".$row['crs_id']."\">Enrol</a>
+                  </div>
+                  <hr>";
+              }
+      else
+      while($row = mysqli_fetch_array($result)) {
+
+          echo " <div class=\"w3-container\">
+              <div class=\"w3-card-2 w3-round w3-white\">
+              <div class=\"w3-container\">
+                <h4 class=\"w3-center\">My Status</h4>
+              <p><i class=\"fa fa-pencil w3-margin-right w3-text-theme\"></i>Chapter No: ".$row['chaps_comp']."</p>
+              <p><i class=\"fa fa-home w3-margin-right w3-text-theme\"></i> Next Deadline: ".$row['next_deadline']." </p>
+              </div>
+              </div>
+              </div>
+              <hr>
+               ";
+          }
+
+
+      ?>
+  </nav>
+
+
+  <!-- Overlay effect when opening sidenav on small screens -->
+  <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"></div>
+
+  <!-- !PAGE CONTENT! -->
+  <div class="w3-main" style="margin-left:300px;margin-top:43px;">
+    <hr>
+
+    <div class="w3-container w3-section" style="width:150%">
+      <div class="w3-row-padding" style="margin:0 -16px">
+        <div class="w3-twothird">
+          <h5>Contents</h5>
+          <table class="w3-table w3-striped w3-white">
+         <tr class="w3-grey w3-text-white w3-padding-16">
+                          <td><i class=\"fa fa-user w3-blue w3-padding-tiny\"></i></td>
+                          <td><b>Chapter No</b></td>
+                          <td><i><b>Chapter Name</b></i></td>
+                           <td><i><b>Chapter Link</b></i></td>
+                           <td><i><b>Assignment Link</b></i></td>
+                            <td><i><b>Duration</b></i></td>
+                </tr>
+          <!-- script for contents table -->
+            <?php
+             
+              $sql="SELECT * FROM crs_content WHERE crs_id = '$crs_id' order by chap_no asc";
+              $result = mysqli_query($con,$sql);
+              if (!$result) {
+                  printf("Error: %s\n", mysqli_error($con));
+                  exit();
+              }
+
+              while($row = mysqli_fetch_array($result)) {
+                  echo "<tr>
+                            <td><i class=\"fa fa-file-pdf-o w3-blue w3-padding-tiny\" ></i></td>
+                            <td>".$row['chap_no']."</td>
+                            <td>".$row['chap_name']."</a></td>
+                            <td><a href=\"pdf.php?link=".$row['chap_link']."\">".$row['chap_link']."</a></td>
+                            <td><a href=\"pdf.php?link=".$row['ass_link']."\">".$row['ass_link']."</a></td>
+                            <td>".$row['duration']."</a></td>
+                          </tr>";
+                  }
+            ?>
+          </table>
+        </div>
+      </div>
+    </div>
+    <hr>
+
+
+    <br>
+    
+
+  <!-- End page content -->
+  </div>
+
+<script>
+// Script to open and close sidenav
+function w3_open() {
+    document.getElementsByClassName("w3-sidenav")[0].style.display = "block";
+    document.getElementsByClassName("w3-overlay")[0].style.display = "block";
+}
+ 
+function w3_close() {
+    document.getElementsByClassName("w3-sidenav")[0].style.display = "none";
+    document.getElementsByClassName("w3-overlay")[0].style.display = "none";
+}
+</script>
+
+</body>
+</html>

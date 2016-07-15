@@ -1,0 +1,47 @@
+<?php
+
+include("connect.php");
+if(isset($_POST['submit'])){
+      $stu_name=$_POST['stu_name'];
+     $stu_dob=$_POST['stu_dob'];
+     $stu_address=$_POST['stu_city']+', '+$_POST['stu_country'];
+    $stu_email=$_POST['stu_email'];
+    $stu_pass=$_POST['password'];
+    $rpassword=$_POST['rpassword'];
+    $type = $_POST['type'];
+    
+  if(  $stu_name=='' or $stu_dob=='' or $stu_pass=='' or $type=='')
+  {
+    echo "<script>alert('any of fields is empty');</script>";
+    exit();
+    
+  }
+  else
+  {
+    if($stu_pass!=$rpassword)
+    {
+      echo "password didn't match.";
+      echo "<script>window.open('signup.php','_self')</script>";
+      exit();
+    }
+    
+     
+     $insert_query1 = "INSERT into student values('$stu_name','$stu_email','$stu_dob','$stu_city','$stu_country','$stu_pass')";
+      $result = mysqli_query($con,$insert_query1) ;
+      if (!$result) {
+          printf("Error: %s\n", mysqli_error($con));
+          exit();
+          }
+        else
+            echo "Done!";
+
+  }
+  
+  
+  
+  
+
+}
+
+
+?>
